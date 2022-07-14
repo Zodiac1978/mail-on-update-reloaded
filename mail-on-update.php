@@ -216,7 +216,7 @@ if ( ! class_exists( 'MailOnUpdate' ) ) {
 			$hit     = false;
 
 			foreach ( explode( ' ', $state_list ) as $istate ) {
-				if ( $state == $istate ) {
+				if ( $state === $istate ) {
 					$res[ $istate ] = $checked;
 					$hit            = true;
 					$break;
@@ -244,7 +244,7 @@ if ( ! class_exists( 'MailOnUpdate' ) ) {
 			$plugin       = strtolower( $plugin );
 			$filtermethod = $this->mou_filtermethod;
 
-			if ( $filtermethod == 'nolist' ) {
+			if ( $filtermethod === 'nolist' ) {
 				return true;
 			}
 
@@ -252,12 +252,12 @@ if ( ! class_exists( 'MailOnUpdate' ) ) {
 				return false;
 			}
 
-			( $filtermethod == 'whitelist' ) ? $state = false : $state = true;
+			( $filtermethod === 'whitelist' ) ? $state = false : $state = true;
 
 			foreach ( explode( "\n", $this->mou_filter ) as $filter ) {
 				$filter = trim( strtolower( $filter ) );
 				if ( ! empty( $filter ) ) {
-					if ( strpos( $filter, -1 ) != '-' ) {
+					if ( strpos( $filter, -1 ) !== '-' ) {
 						if ( ! ( strpos( $plugin, $filter ) === false ) ) {
 							$state = ! $state;
 							break;
@@ -275,7 +275,7 @@ if ( ! class_exists( 'MailOnUpdate' ) ) {
 			$del         = '';
 			foreach ( (array) $all_plugins as $plugin_file => $plugin_data ) {
 				$plugin = wp_kses( $plugin_data['Title'], array() );
-				if ( $plugin != '' ) {
+				if ( $plugin !== '' ) {
 					( is_plugin_active( $plugin_file ) ) ? $inact                  = '' : $inact = ' (' . esc_html__( 'inactive', 'mail-on-update' ) . ')';
 					( $this->mailonupdate_pqual( $plugin, $plugin_file ) ) ? $flag = '[x] ' : $flag = '[ ] ';
 
@@ -313,7 +313,7 @@ if ( ! class_exists( 'MailOnUpdate' ) ) {
 						}
 					}
 
-					if ( $recipients != null && ! empty( $recipients ) ) {
+					if ( $recipients !== null && ! empty( $recipients ) ) {
 						$mailto      = '';
 						$lastElement = end( $recipients );
 						foreach ( $recipients as $recipient ) {
@@ -344,7 +344,7 @@ if ( ! class_exists( 'MailOnUpdate' ) ) {
 			$exclude = '';
 			foreach ( $mailtos as $mailto ) {
 				$user = get_user_by( 'email', $mailto );
-				if ( $user != null ) {
+				if ( $user !== null ) {
 					$exclude .= $user->ID . ',';
 					$users [] = $user;
 				}
@@ -356,7 +356,7 @@ if ( ! class_exists( 'MailOnUpdate' ) ) {
 
 			<script type="text/javascript">
 			jQuery( document ).ready(function() {
-				 jQuery('#remove').click(function() {
+				jQuery('#remove').click(function() {
 					var value = jQuery('#select1 option:selected').val();
 					if (jQuery("#select2 option[value='" + value + "']").length <= 0) {
 						return !jQuery('#select1 option:selected').remove().appendTo('#select2');
@@ -364,7 +364,7 @@ if ( ! class_exists( 'MailOnUpdate' ) ) {
 						return !jQuery('#select1 option:selected').remove();
 					}
 				});
-				  jQuery('#add').click(function() {
+				jQuery('#add').click(function() {
 					var value = jQuery('#select2 option:selected').val();
 					if (jQuery("#select1 option[value='" + value + "']").length <= 0) {
 						return !jQuery('#select2 option:selected').remove().appendTo('#select1');
@@ -401,7 +401,7 @@ if ( ! class_exists( 'MailOnUpdate' ) ) {
 											}
 										}
 										?>
-										  </select>
+										</select>
 										<br /><br /><button class="button-primary" style="width: 100%" id="remove"><?php echo esc_html__( 'Remove', 'mail-on-update' ); ?></button>
 									</td>
 								</tr>
@@ -419,7 +419,7 @@ if ( ! class_exists( 'MailOnUpdate' ) ) {
 										}
 										?>
 										</select>
-										  <br /><br /><button class="button-primary" style="width: 100%" id="add"><?php echo esc_html__( 'Add', 'mail-on-update' ); ?></button>
+										<br /><br /><button class="button-primary" style="width: 100%" id="add"><?php echo esc_html__( 'Add', 'mail-on-update' ); ?></button>
 								</tr>
 								<tr>
 									<td><?php echo esc_html__( 'You can select multiple administrative users as a recipient. If no recipient is selected, the notification will be send to:', 'mail-on-update' ); ?>&nbsp;<?php echo get_option( 'admin_email' ); ?></td>
