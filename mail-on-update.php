@@ -1,17 +1,18 @@
 <?php
 /*
 Plugin Name: Mail On Update
-Plugin URI: http://www.svenkubiak.de/mail-on-update
+Plugin URI: https://github.com/Zodiac1978/mail-on-update-reloaded
 Description: Sends an eMail notification to one or multiple eMail addresses if new versions of plugins are available.
-Version: 5.4.13
-Author: Sven Kubiak, Matthias Kindler
-Author URI: https://svenkubiak.de
+Version: 5.4.14
+Author: Sven Kubiak, Matthias Kindler, Torsten Landsiedel
+Author URI: https://torstenlandsiedel.de
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: mail-on-update
 Domain Path: /languages
 
-Copyright 2008-2020 Sven Kubiak, Matthias Kindler
+Copyright 2022 Torsten Landsiedel
+Copyright 2008-2022 Sven Kubiak, Matthias Kindler
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -52,7 +53,7 @@ if ( ! class_exists( 'MailOnUpdate' ) ) {
 				return false;
 			}
 
-			// load mail on update options
+			// Load mail on update options.
 			$this->getOptions();
 
 			add_action( 'wp_footer', array( &$this, 'checkPlugins' ) );
@@ -110,7 +111,7 @@ if ( ! class_exists( 'MailOnUpdate' ) ) {
 		}
 
 		function wpVersionFailed() {
-			echo "<div id='message' class='error fade'><p>" . __( 'Your WordPress is too old. Mail On Update requires at least WordPress 3.0!', 'mail-on-update' ) . '</p></div>';
+			echo "<div id='message' class='error fade'><p>" . esc_html__( 'Your WordPress is too old. Mail On Update requires at least WordPress 3.0!', 'mail-on-update' ) . '</p></div>';
 		}
 
 		function checkPlugins() {
@@ -150,37 +151,41 @@ if ( ! class_exists( 'MailOnUpdate' ) ) {
 			// Loop through available plugin updates.
 			foreach ( $updates->response as $pluginfile => $update ) {
 				if ( $this->mailonupdate_pqual( $plugins[ $pluginfile ]['Name'], $pluginfile ) ) {
-					$message .= sprintf( __( 'A new version of %1$s is available.', 'mail-on-update' ), trim( $plugins[ $pluginfile ]['Name'] ) );
+					/* translators: %1$s is the plugin name */
+					$message .= sprintf( esc_html__( 'A new version of %1$s is available.', 'mail-on-update' ), trim( $plugins[ $pluginfile ]['Name'] ) );
 					$message .= "\n";
-					$message .= sprintf( __( '- Installed: %1$s, Current: %2$s', 'mail-on-update' ), $plugins[ $pluginfile ]['Version'], $update->new_version );
+					/* translators: %1$s is the plugin version which is installed, %2$s is the available version */
+					$message .= sprintf( esc_html__( '- Installed: %1$s, Current: %2$s', 'mail-on-update' ), $plugins[ $pluginfile ]['Version'], $update->new_version );
 					$message .= "\n\n";
 				} else {
-					( is_plugin_active( $pluginfile ) ) ? $act = __( 'active', 'mail-on-update' ) : $act = __( 'inactive', 'mail-on-update' );
-					$pluginNotVaildated                       .= "\n" . sprintf( __( 'A new version (%1$s) of %2$s is available. (%3s)', 'mail-on-update' ), $update->new_version, $plugins[ $pluginfile ]['Name'], $act );
+					( is_plugin_active( $pluginfile ) ) ? $act = esc_html__( 'active', 'mail-on-update' ) : $act = esc_html__( 'inactive', 'mail-on-update' );
+					/* translators: %1$s is the new available version number, %2$s is the plugin name and %3$s is the status (active/inactive) */
+					$pluginNotVaildated                       .= "\n" . sprintf( esc_html__( 'A new version (%1$s) of %2$s is available. (%3$s)', 'mail-on-update' ), $update->new_version, $plugins[ $pluginfile ]['Name'], $act );
 				}
 			}
 
-			if ( $message != '' && ( $this->mou_singlenotification == '' || ( $message != $this->mou_lastmessage && $this->mou_singlenotification != '' ) ) ) {
+			if ( $message !== '' && ( $this->mou_singlenotification === '' || ( $message !== $this->mou_lastmessage && $this->mou_singlenotification !== '' ) ) ) {
 				$this->mou_lastmessage = $message;
 
-				// append siteurl to notfication e-mail
-				$message .= __( 'Update your Plugins at', 'mail-on-update' ) . "\n" . site_url() . '/wp-admin/update-core.php';
+				// Append siteurl to notfication e-mail.
+				$message .= esc_html__( 'Update your Plugins at', 'mail-on-update' ) . "\n" . site_url() . '/wp-admin/update-core.php';
 
 				if ( $pluginNotVaildated != '' ) {
-					$message .= "\n\n" . __( 'There are also updates available for the plugins below. However, these plugins are of no concern for this notifier and the information is just for completeness.', 'mail-on-update' ) . "\n" . $pluginNotVaildated;
+					$message .= "\n\n" . esc_html__( 'There are also updates available for the plugins below. However, these plugins are of no concern for this notifier and the information is just for completeness.', 'mail-on-update' ) . "\n" . $pluginNotVaildated;
 				}
 
-				// set mail header for notification message
+				// Set mail header for notification message.
 				$sender  = 'WordPress@' . preg_replace( '#^www\.#', '', strtolower( $_SERVER['SERVER_NAME'] ) );
 				$from    = "From: \"$sender\" <$sender>";
 				$headers = "$from\n" . 'Content-Type: text/plain; charset="' . get_option( 'blog_charset' ) . "\"\n";
 
-				// send e-mail notification to admin or multiple recipienes
-				$subject = sprintf( __( '[%s] Plugin Update Notification', 'mail-on-update' ), $blogname );
+				// Send e-mail notification to admin or multiple recipients.
+				/* translators: %s is the name of the site */
+				$subject = sprintf( esc_html__( '[%s] Plugin Update Notification', 'mail-on-update' ), $blogname );
 				wp_mail( $this->mailonupdate_listOfCommaSeparatedRecipients(), $subject, $message, $headers );
 			}
 
-			// set timestamp of last update check
+			// Set timestamp of last update check.
 			$this->mou_lastchecked = time();
 			$this->setOptions();
 		}
@@ -191,7 +196,7 @@ if ( ! class_exists( 'MailOnUpdate' ) ) {
 
 		function verifyNonce( $nonce ) {
 			if ( ! wp_verify_nonce( $nonce, 'mailonupdate-nonce' ) ) {
-				wp_die( __( 'Security-Check failed.', 'mail-on-update' ), '', array( 'response' => 403 ) );
+				wp_die( esc_html__( 'Security-Check failed.', 'mail-on-update' ), '', array( 'response' => 403 ) );
 			}
 
 			return true;
@@ -271,7 +276,7 @@ if ( ! class_exists( 'MailOnUpdate' ) ) {
 			foreach ( (array) $all_plugins as $plugin_file => $plugin_data ) {
 				$plugin = wp_kses( $plugin_data['Title'], array() );
 				if ( $plugin != '' ) {
-					( is_plugin_active( $plugin_file ) ) ? $inact                  = '' : $inact = ' (' . __( 'inactive', 'mail-on-update' ) . ')';
+					( is_plugin_active( $plugin_file ) ) ? $inact                  = '' : $inact = ' (' . esc_html__( 'inactive', 'mail-on-update' ) . ')';
 					( $this->mailonupdate_pqual( $plugin, $plugin_file ) ) ? $flag = '[x] ' : $flag = '[ ] ';
 
 					$l  .= "$del$flag$plugin$inact";
@@ -284,7 +289,7 @@ if ( ! class_exists( 'MailOnUpdate' ) ) {
 
 		function mailonupdateConf() {
 			if ( ! current_user_can( 'manage_options' ) ) {
-				wp_die( __( 'Sorry, but you have no permissions to change settings.', 'mail-on-update' ) );
+				wp_die( esc_html__( 'Sorry, but you have no permissions to change settings.', 'mail-on-update' ) );
 			}
 
 			( isset( $_REQUEST['_wpnonce'] ) ) ? $nonce = $_REQUEST['_wpnonce'] : $nonce = '';
@@ -331,7 +336,7 @@ if ( ! class_exists( 'MailOnUpdate' ) ) {
 				};
 
 				$this->setOptions();
-				echo '<div id="message" class="updated fade"><p><strong>' . __( 'Mail On Update settings successfully saved.', 'mail-on-update' ) . '</strong></p></div>';
+				echo '<div id="message" class="updated fade"><p><strong>' . esc_html__( 'Mail On Update settings successfully saved.', 'mail-on-update' ) . '</strong></p></div>';
 			};
 
 			$mailtos = explode( ',', $this->mou_mailto );
@@ -376,15 +381,15 @@ if ( ! class_exists( 'MailOnUpdate' ) ) {
 			</script>
 			<div class="wrap">
 				<div id="icon-options-general" class="icon32"></div>
-				<h2><?php echo __( 'Mail On Update Settings', 'mail-on-update' ); ?></h2>
+				<h2><?php echo esc_html__( 'Mail On Update Settings', 'mail-on-update' ); ?></h2>
 				<div id="poststuff" class="ui-sortable">
 					<div class="postbox opened">
-						<h3 class="hndle"><label for="title"><?php echo __( 'Notification settings', 'mail-on-update' ); ?></label></h3>
+						<h3 class="hndle"><label for="title"><?php echo esc_html__( 'Notification settings', 'mail-on-update' ); ?></label></h3>
 						<div class="inside">
 							<form action="options-general.php?page=mail-on-update&_wpnonce=<?php echo $nonce; ?>" method="post" id="mailonupdate-conf">
 							<table class="form-table">
 								<tr>
-									<td><?php echo __( 'Selected recipients', 'mail-on-update' ); ?></td>
+									<td><?php echo esc_html__( 'Selected recipients', 'mail-on-update' ); ?></td>
 								</tr>
 								<tr>
 									<td>
@@ -397,11 +402,11 @@ if ( ! class_exists( 'MailOnUpdate' ) ) {
 										}
 										?>
 										  </select>
-										<br /><br /><button class="button-primary" style="width: 100%" id="remove"><?php echo __( 'Remove', 'mail-on-update' ); ?></button>
+										<br /><br /><button class="button-primary" style="width: 100%" id="remove"><?php echo esc_html__( 'Remove', 'mail-on-update' ); ?></button>
 									</td>
 								</tr>
 								<tr>
-									<td><?php echo __( 'Available recipients', 'mail-on-update' ); ?></td>
+									<td><?php echo esc_html__( 'Available recipients', 'mail-on-update' ); ?></td>
 								</tr>
 								<tr>
 									<td>
@@ -414,56 +419,56 @@ if ( ! class_exists( 'MailOnUpdate' ) ) {
 										}
 										?>
 										</select>
-										  <br /><br /><button class="button-primary" style="width: 100%" id="add"><?php echo __( 'Add', 'mail-on-update' ); ?></button>
+										  <br /><br /><button class="button-primary" style="width: 100%" id="add"><?php echo esc_html__( 'Add', 'mail-on-update' ); ?></button>
 								</tr>
 								<tr>
-									<td><?php echo __( 'You can select multiple administrative users as a recipient. If no recipient is selected, the notification will be send to:', 'mail-on-update' ); ?>&nbsp;<?php echo get_option( 'admin_email' ); ?></td>
+									<td><?php echo esc_html__( 'You can select multiple administrative users as a recipient. If no recipient is selected, the notification will be send to:', 'mail-on-update' ); ?>&nbsp;<?php echo get_option( 'admin_email' ); ?></td>
 								</tr>
 								<tr>
 									<td valign="top">
-									<label><input type="checkbox" name="mailonupdate_singlenotification" value="checked" <?php print $this->mou_singlenotification; ?> /> <?php echo __( 'Send only one notification per update', 'mail-on-update' ); ?></label>
+									<label><input type="checkbox" name="mailonupdate_singlenotification" value="checked" <?php print $this->mou_singlenotification; ?> /> <?php echo esc_html__( 'Send only one notification per update', 'mail-on-update' ); ?></label>
 									</td>
 								</tr>
 							</table>
-							<p class="submit"><input type="submit" class='button-primary' name="submit" value="<?php echo __( 'Save', 'mail-on-update' ); ?>" /></p>
+							<p class="submit"><input type="submit" class='button-primary' name="submit" value="<?php echo esc_html__( 'Save', 'mail-on-update' ); ?>" /></p>
 							</form>
 						</div>
 					</div>
 				</div>
 				<div id="poststuff" class="ui-sortable">
 					<div class="postbox opened">
-						<h3 class="hndle"><label for="title"><?php echo __( 'Filters', 'mail-on-update' ); ?></label></h3>
+						<h3 class="hndle"><label for="title"><?php echo esc_html__( 'Filters', 'mail-on-update' ); ?></label></h3>
 						<div class="inside">
 							<form action="options-general.php?page=mail-on-update&_wpnonce=<?php echo $nonce; ?>" method="post" id="mailonupdate-conf">
 							<table class="form-table">
 								<tr>
 									<td width="10"><textarea id="mailonupdate_filter" name="mailonupdate_filter" cols="40" rows="5"><?php echo $this->mou_filter; ?></textarea></td>
 									<td valign="top">
-									<?php echo __( '* A plugin is matched if the filter is a substring', 'mail-on-update' ); ?><br />
-									<?php echo __( '* A filter has to appear on a single line', 'mail-on-update' ); ?><br />
-									<?php echo __( '* A filter is not case sensetive', 'mail-on-update' ); ?><br />
-									<?php echo __( '* A filter is considered as a string and no regexp', 'mail-on-update' ); ?><br />
-									<?php echo __( '* A filter with "-" at the end is not considered', 'mail-on-update' ); ?>
+									<?php echo esc_html__( '* A plugin is matched if the filter is a substring', 'mail-on-update' ); ?><br />
+									<?php echo esc_html__( '* A filter has to appear on a single line', 'mail-on-update' ); ?><br />
+									<?php echo esc_html__( '* A filter is not case sensetive', 'mail-on-update' ); ?><br />
+									<?php echo esc_html__( '* A filter is considered as a string and no regexp', 'mail-on-update' ); ?><br />
+									<?php echo esc_html__( '* A filter with "-" at the end is not considered', 'mail-on-update' ); ?>
 									<?php $rval = $this->rbc( 'mailonupdate_filtermethod', 'nolist blacklist whitelist', 'nolist' ); ?>
 									</td>
 								</tr>
 								<tr>
 									<td valign="top">
-									<input type="radio" name="mailonupdate_filtermethod" value="nolist" <?php print $rval['nolist']; ?> /> <?php echo __( 'Don\'t filter plugins', 'mail-on-update' ); ?><br />
-									<input type="radio" name="mailonupdate_filtermethod" value="blacklist" <?php print $rval['blacklist']; ?> /> <?php echo __( 'Blacklist filter (exclude plugins)', 'mail-on-update' ); ?><br />
-									<input type="radio" name="mailonupdate_filtermethod" value="whitelist" <?php print $rval['whitelist']; ?> /> <?php echo __( 'Whitelist filter (include plugins)', 'mail-on-update' ); ?><br />
-									<input type="checkbox" name="mailonupdate_exclinact" value="checked" <?php print $this->mou_exclinact; ?> /> <?php echo __( 'Don\'t validate inactive plugins', 'mail-on-update' ); ?>
+									<input type="radio" name="mailonupdate_filtermethod" value="nolist" <?php print $rval['nolist']; ?> /> <?php echo esc_html__( 'Don\'t filter plugins', 'mail-on-update' ); ?><br />
+									<input type="radio" name="mailonupdate_filtermethod" value="blacklist" <?php print $rval['blacklist']; ?> /> <?php echo esc_html__( 'Blacklist filter (exclude plugins)', 'mail-on-update' ); ?><br />
+									<input type="radio" name="mailonupdate_filtermethod" value="whitelist" <?php print $rval['whitelist']; ?> /> <?php echo esc_html__( 'Whitelist filter (include plugins)', 'mail-on-update' ); ?><br />
+									<input type="checkbox" name="mailonupdate_exclinact" value="checked" <?php print $this->mou_exclinact; ?> /> <?php echo esc_html__( 'Don\'t validate inactive plugins', 'mail-on-update' ); ?>
 									</td>
 								</tr>
 							</table>
-							<p class="submit"><input type="submit" class='button-primary' name="submit" value="<?php echo __( 'Save', 'mail-on-update' ); ?>" /></p>
+							<p class="submit"><input type="submit" class='button-primary' name="submit" value="<?php echo esc_html__( 'Save', 'mail-on-update' ); ?>" /></p>
 							</form>
 						</div>
 					</div>
 				</div>
 				<div id="poststuff" class="ui-sortable">
 					<div class="postbox opened">
-						<h3 class="hndle"><label for="title"><?php echo __( 'Plugins to validate', 'mail-on-update' ); ?></label></h3>
+						<h3 class="hndle"><label for="title"><?php echo esc_html__( 'Plugins to validate', 'mail-on-update' ); ?></label></h3>
 						<div class="inside">
 							<table class="form-table">
 								<tr>
@@ -471,8 +476,8 @@ if ( ! class_exists( 'MailOnUpdate' ) ) {
 								</tr>
 								<tr>
 									<td>
-									[x] <?php echo __( 'Plugin will be validated', 'mail-on-update' ); ?><br />
-									[ ] <?php echo __( 'Plugin will not be validated', 'mail-on-update' ); ?><br />
+									[x] <?php echo esc_html__( 'Plugin will be validated', 'mail-on-update' ); ?><br />
+									[ ] <?php echo esc_html__( 'Plugin will not be validated', 'mail-on-update' ); ?><br />
 									</td>
 								</tr>
 							</table>
