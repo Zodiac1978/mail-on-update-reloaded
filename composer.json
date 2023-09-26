@@ -1,0 +1,17 @@
+{
+	"name": "zodiac1978/mail-on-update-reloaded",
+	"description": "Sends an e-Mail to one or multiple administrators if new updates of plugins are available.",
+
+	"require-dev": {
+		"ext-curl": "*",
+		"ext-dom": "*",
+		"ext-json": "*",
+		"ext-sqlite3": "*",
+		"phpstan/phpstan": "1.*"
+	},
+	"autoload": {
+		"psr-4": {
+			"App\\": "src"
+		}
+	}
+}
