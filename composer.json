@@ -15,6 +15,6 @@
 		}
 	},
 	"scripts": {
-		"analyze": "@php ./vendor/bin/phpstan analyze",
-	},
+		"analyze": "@php ./vendor/bin/phpstan analyze"
+	}
 }
