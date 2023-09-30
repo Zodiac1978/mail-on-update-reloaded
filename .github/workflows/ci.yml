@@ -9,7 +9,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - uses: php-actions/composer@v2 # or alternative dependency management
-    - uses: dingo-d/phpstan-wp-action@v1
+    - uses: dingo-d/phpstan-wp-action@v2
       with:
         level: 5
         paths_file: mail-on-update.php
