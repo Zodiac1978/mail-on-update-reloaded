@@ -9,6 +9,8 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - uses: php-actions/composer@v6 # or alternative dependency management
-    - uses: php-actions/phpstan@v3
-      with:
-        path: /
+    - uses: dingo-d/phpstan-wp-action@v1
+      parameters:
+        level: 5
+        paths:
+            - mail-on-update.php
