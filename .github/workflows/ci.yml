@@ -12,5 +12,4 @@ jobs:
     - uses: dingo-d/phpstan-wp-action@v1
       with:
         level: 5
-        paths:
-            - mail-on-update.php
+        paths_file: mail-on-update.php
