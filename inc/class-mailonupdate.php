@@ -16,21 +16,21 @@ class MailOnUpdate {
 
 		// Is WordPress at least version 3.0?
 		if ( ! MOUISWP30 ) {
-			add_action( 'admin_notices', array( &$this, 'wpVersionFailed' ) );
-			return false;
+			add_action( 'admin_notices', array( $this, 'wpVersionFailed' ) );
+			return;
 		}
 
 		// Load mail on update options.
 		$this->getOptions();
 
-		add_action( 'wp_footer', array( &$this, 'checkPlugins' ) );
-		add_action( 'admin_menu', array( &$this, 'mouAdminMenu' ) );
+		add_action( 'wp_footer', array( $this, 'checkPlugins' ) );
+		add_action( 'admin_menu', array( $this, 'mouAdminMenu' ) );
 
 		if ( function_exists( 'register_activation_hook' ) ) {
-			register_activation_hook( __FILE__, array( &$this, 'activate' ) );
+			register_activation_hook( __FILE__, array( $this, 'activate' ) );
 		}
 		if ( function_exists( 'register_uninstall_hook' ) ) {
-			register_uninstall_hook( __FILE__, 'uninstall' );
+			register_uninstall_hook( __FILE__, array( __CLASS__, 'uninstall' ) );
 		}
 	}
 
@@ -88,7 +88,7 @@ class MailOnUpdate {
 
 		// Is last check more than 12 hours ago?
 		if ( time() < $this->mou_lastchecked + 43200 ) {
-			return false;
+			return;
 		}
 
 		// Include WordPress update functions.
@@ -106,7 +106,7 @@ class MailOnUpdate {
 
 		// Are plugin updates available?
 		if ( empty( $updates->response ) ) {
-			return false;
+			return;
 		}
 
 		// Get all plugins.
@@ -186,11 +186,11 @@ class MailOnUpdate {
 			if ( $state === $istate ) {
 				$res[ $istate ] = $checked;
 				$hit            = true;
-				$break;
+				break;
 			}
 		}
 
-		( ! $hit ) ? $res[ "$default" ] = $checked : false;
+		$res[ "$default" ] = $hit ? false : $checked;
 
 		if ( ! array_key_exists( 'blacklist', $res ) ) {
 			$res['blacklist'] = '';
@@ -308,15 +308,15 @@ class MailOnUpdate {
 
 		$mailtos = explode( ',', $this->mou_mailto );
 		$users   = array();
-		$exclude = '';
+		$exclude = array();
 		foreach ( $mailtos as $mailto ) {
 			$user = get_user_by( 'email', $mailto );
 			if ( $user !== null ) {
-				$exclude .= $user->ID . ',';
-				$users [] = $user;
+				$exclude[] = $user->ID;
+				$users []  = $user;
 			}
 		}
-		$administrators = get_users( 'role=administrator&exclude=' . $exclude );
+		$administrators = get_users( array( 'role' => 'administrator', 'exclude' => $exclude ) );
 		$nonce          = wp_create_nonce( 'mailonupdate-nonce' );
 
 		?>
