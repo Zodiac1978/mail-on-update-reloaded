@@ -1,0 +1,11 @@
+includes:
+	- vendor/szepeviktor/phpstan-wordpress/extension.neon
+parameters:
+	level: 5
+	dynamicConstantNames:
+		- MOUISWP30
+	bootstrapFiles:
+		- tests/phpstan-bootstrap.php
+	paths:
+		- mail-on-update.php
+		- inc/class-mailonupdate.php

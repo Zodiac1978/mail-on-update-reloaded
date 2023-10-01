@@ -1,0 +1,14 @@
+name: Integrate
+
+on:
+  pull_request: null
+  push: null
+
+jobs:
+  phpstan:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - uses: ramsey/composer-install@v2
+    - run: composer run analyze
