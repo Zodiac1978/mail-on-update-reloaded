@@ -113,7 +113,7 @@ class MailOnUpdate {
 		$plugins            = get_plugins();
 		$blogname           = get_option( 'blogname' );
 		$message            = '';
-		$pluginNotVaildated = '';
+		$pluginNotValidated = '';
 
 		// Loop through available plugin updates.
 		foreach ( $updates->response as $pluginfile => $update ) {
@@ -127,18 +127,18 @@ class MailOnUpdate {
 			} else {
 				( is_plugin_active( $pluginfile ) ) ? $act = esc_html__( 'active', 'mail-on-update' ) : $act = esc_html__( 'inactive', 'mail-on-update' );
 				/* translators: %1$s is the new available version number, %2$s is the plugin name and %3$s is the status (active/inactive) */
-				$pluginNotVaildated                       .= "\n" . sprintf( esc_html__( 'A new version (%1$s) of %2$s is available. (%3$s)', 'mail-on-update' ), $update->new_version, $plugins[ $pluginfile ]['Name'], $act );
+				$pluginNotValidated                       .= "\n" . sprintf( esc_html__( 'A new version (%1$s) of %2$s is available. (%3$s)', 'mail-on-update' ), $update->new_version, $plugins[ $pluginfile ]['Name'], $act );
 			}
 		}
 
 		if ( $message !== '' && ( $this->mou_singlenotification === '' || ( $message !== $this->mou_lastmessage && $this->mou_singlenotification !== '' ) ) ) {
 			$this->mou_lastmessage = $message;
 
-			// Append siteurl to notfication e-mail.
+			// Append siteurl to notification e-mail.
 			$message .= esc_html__( 'Update your Plugins at', 'mail-on-update' ) . "\n" . site_url() . '/wp-admin/update-core.php';
 
-			if ( $pluginNotVaildated != '' ) {
-				$message .= "\n\n" . esc_html__( 'There are also updates available for the plugins below. However, these plugins are of no concern for this notifier and the information is just for completeness.', 'mail-on-update' ) . "\n" . $pluginNotVaildated;
+			if ( $pluginNotValidated != '' ) {
+				$message .= "\n\n" . esc_html__( 'There are also updates available for the plugins below. However, these plugins are of no concern for this notifier and the information is just for completeness.', 'mail-on-update' ) . "\n" . $pluginNotValidated;
 			}
 
 			// Set mail header for notification message.
@@ -413,7 +413,7 @@ class MailOnUpdate {
 								<td valign="top">
 								<?php echo esc_html__( '* A plugin is matched if the filter is a substring', 'mail-on-update' ); ?><br />
 								<?php echo esc_html__( '* A filter has to appear on a single line', 'mail-on-update' ); ?><br />
-								<?php echo esc_html__( '* A filter is not case sensetive', 'mail-on-update' ); ?><br />
+								<?php echo esc_html__( '* A filter is not case sensitive', 'mail-on-update' ); ?><br />
 								<?php echo esc_html__( '* A filter is considered as a string and no regexp', 'mail-on-update' ); ?><br />
 								<?php echo esc_html__( '* A filter with "-" at the end is not considered', 'mail-on-update' ); ?>
 								<?php $rval = $this->rbc( 'mailonupdate_filtermethod', 'nolist blacklist whitelist', 'nolist' ); ?>

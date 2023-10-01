@@ -10,7 +10,7 @@ Sends an e-Mail to one or multiple administrators if new updates of plugins are 
 == Description ==
 
 Since WordPress Version 2.5, WordPress automatically checks if a new update for an installed plugin is available. However, you still have to check your wp-admin to see the notification. This plugin informs you via e-Mail when a new update is available.
-It uses the WordPress build-in update function to periodically check for new versions at the WordPress plugin directory. If a new version is available, either a single or multiple administrators will recieve an e-mail, informing them which plugins needs to be updated.
+It uses the WordPress build-in update function to periodically check for new versions at the WordPress plugin directory. If a new version is available, either a single or multiple administrators will receive an e-mail, informing them which plugins needs to be updated.
 
 = Available Languages  =
 
@@ -103,7 +103,7 @@ Done.
 = 5.3.0 =
 * Added option to select multiple admin recipients
 * Remove Flattr button from backend and moved it to email footer
-* Fixed bug that reseted the settings when plugin was deactivated
+* Fixed bug that reset the settings when plugin was deactivated
 * Added nonce check to form
 * Removed unmanged translations
 * Updated translations
@@ -146,7 +146,7 @@ Done.
 
 = 4.6.0 =
 * Minor Code clean up
-* Check compatability with WordPress 3.5
+* Check compatibility with WordPress 3.5
 
 = 4.5 =
 * Fixed some deprecated message
@@ -175,8 +175,8 @@ Done.
 * Update language files
 
 = 3.3 =
-* Removed debug informations which made it in the release (sorry)
-* Change Subject of notifcation E-Mails
+* Removed debug information which made it in the release (sorry)
+* Change Subject of notification E-Mails
 * Added new WordPress Plugins Changelog
 
 = 3.2 =
@@ -204,7 +204,7 @@ Done.
 * Fixed Bug when checke WordPress Version
 
 = 2.4 =
-* Fixed Bug when validating E-Mail-Adresses
+* Fixed Bug when validating E-Mail-Addresses
 * Fixed Bug with UTF-8 encoding
 * Fixed Bug when validating if a plugin is active or not
 * Updated language file
@@ -213,7 +213,7 @@ Done.
 * Fixed Bug when sending notifications
 
 = 2.2 =
-* Fixed Pharse Error
+* Fixed Phrase Error
 
 = 2.1 =
 * Updated language file
