@@ -125,7 +125,7 @@ class MailOnUpdate {
 				$message .= sprintf( esc_html__( '- Installed: %1$s, Current: %2$s', 'mail-on-update' ), $plugins[ $pluginfile ]['Version'], $update->new_version );
 				$message .= "\n\n";
 			} else {
-				( is_plugin_active( $pluginfile ) ) ? $act = esc_html__( 'active', 'mail-on-update' ) : $act = esc_html__( 'inactive', 'mail-on-update' );
+				$act = is_plugin_active( $pluginfile ) ? esc_html__( 'active', 'mail-on-update' ) : esc_html__( 'inactive', 'mail-on-update' );
 				/* translators: %1$s is the new available version number, %2$s is the plugin name and %3$s is the status (active/inactive) */
 				$pluginNotValidated                       .= "\n" . sprintf( esc_html__( 'A new version (%1$s) of %2$s is available. (%3$s)', 'mail-on-update' ), $update->new_version, $plugins[ $pluginfile ]['Name'], $act );
 			}
@@ -219,7 +219,7 @@ class MailOnUpdate {
 			return false;
 		}
 
-		( $filtermethod === 'whitelist' ) ? $state = false : $state = true;
+		$state = $filtermethod !== 'whitelist';
 
 		foreach ( explode( "\n", $this->mou_filter ) as $filter ) {
 			$filter = trim( strtolower( $filter ) );
@@ -243,8 +243,8 @@ class MailOnUpdate {
 		foreach ( (array) $all_plugins as $plugin_file => $plugin_data ) {
 			$plugin = wp_kses( $plugin_data['Title'], array() );
 			if ( $plugin !== '' ) {
-				( is_plugin_active( $plugin_file ) ) ? $inact                  = '' : $inact = ' (' . esc_html__( 'inactive', 'mail-on-update' ) . ')';
-				( $this->mailonupdate_pqual( $plugin, $plugin_file ) ) ? $flag = '[x] ' : $flag = '[ ] ';
+				$inact = is_plugin_active( $plugin_file ) ? '' : ' (' . esc_html__( 'inactive', 'mail-on-update' ) . ')';
+				$flag = $this->mailonupdate_pqual( $plugin, $plugin_file ) ? '[x] ' : '[ ] ';
 
 				$l  .= "$del$flag$plugin$inact";
 				$del = "\n";
@@ -259,13 +259,11 @@ class MailOnUpdate {
 			wp_die( esc_html__( 'Sorry, but you have no permissions to change settings.', 'mail-on-update' ) );
 		}
 
-		( isset( $_REQUEST['_wpnonce'] ) ) ? $nonce = $_REQUEST['_wpnonce'] : $nonce = '';
+		$nonce = isset( $_REQUEST['_wpnonce'] ) ? $_REQUEST['_wpnonce'] : '';
 		if ( isset( $_POST['submit'] ) && $this->verifyNonce( $nonce ) ) {
-			if ( isset( $_POST['mailonupdate_singlenotification'] ) ) {
-				$this->mou_singlenotification = $_POST['mailonupdate_singlenotification'];
-			} else {
-				$this->mou_singlenotification = '';
-			}
+			$this->mou_singlenotification = isset( $_POST['mailonupdate_singlenotification'] )
+				? $_POST['mailonupdate_singlenotification']
+				: '';
 
 			if ( isset( $_POST['mailonupdate_recipients'] ) ) {
 				$recipients = array();
