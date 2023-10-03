@@ -1,4 +1,7 @@
+includes:
+  - vendor/phpstan/phpstan/conf/bleedingEdge.neon
+  - vendor/szepeviktor/phpstan-wordpress/extension.neon
 parameters:
-	level: 5
-	paths:
-		- mail-on-update.php
+  level: 5
+  paths:
+    - mail-on-update.php
